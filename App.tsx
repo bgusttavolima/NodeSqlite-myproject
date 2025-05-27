@@ -3,13 +3,29 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Icon, MD3Colors } from 'react-native-paper';
 import { useEffect, useState } from 'react';
-import { Conexao } from './Conf/Banco';
+import { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId } from './Conf/Banco';
 export default function App() {
 
   // ---- HOOK
   useEffect(()=>{
      async function Main() {
         let db =  await Conexao();
+        await createTable(db);
+        // inserirUsuario(db,'Giovanna','@Giovanna');
+
+          const registro = await selectUsuario(db);
+
+          for( const linhas of registro as {ID_US:number, NOME_US:string, EMAIL_US:string } ){
+             
+              console.log(linhas.ID_US, linhas.NOME_US, linhas.EMAIL_US,)
+          }
+
+         const nome  = await selectUsuarioId(db,2);       
+
+             
+              console.log(nome.ID_US, nome.NOME_US,nome.EMAIL_US,)
+        
+
       
      }
       
