@@ -1,85 +1,55 @@
-import * as  SQLite from 'expo-sqlite';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import { Icon, MD3Colors } from 'react-native-paper';
+import { useEffect, useState } from 'react';
+import { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId, dropTable , deleteUsuario} from './Conf/Banco';
+export default function App() {
 
-async function Conexao() {
-    try {
-        const db = await SQLite.openDatabaseAsync('PAM2');
-        console.log('Banco Criado');
-        return db;
-    } catch (error) {
-        console.log('erro ao criar o banco ' + error);
-    }
-}
+  // ---- HOOK
+  useEffect(()=>{
+     async function Main(){
+        let db =  await Conexao();
+       // await createTable(db);
+       // await dropTable(db, 'USUARIO');
+      // inserirUsuario(db,"Ricardo","@Giovanna");
 
-//-------------------------------------------
-async function createTable(db: SQLite.SQLiteDatabase) {
-    try {
-        await db.execAsync(
-            ` PRAGMA journal_mode = WAL;
-        CREATE TABLE IF NOT EXISTS USUARIO(
-           ID_US INTEGER PRIMARY KEY AUTOINCREMENT,
-           NOME_US VARCHAR(100),
-           EMAIL_US VARCHAR(100)
-        )`
-        );
-        console.log('Tabela Criada !!!');
+       const registro = await selectUsuario(db);
 
-    } catch (erro) {
-           console.log('Erro Tabela !!!');           
-    }
-}
-// -------------------------------------------
-// inserir dados na tabela
-
-async function inserirUsuario(db: SQLite.SQLiteDatabase, name:string, email:string) {
-  
-    try {
-          await  db.runAsync(
-            " INSERT INTO USUARIO(NOME_US, EMAIL_US ) VALUES(? , ?) ", name, email
-          );
-          console.log("Inserido com sucesso");
-
-    } catch (error) {
-         console.log('Erro ao inserir usuario ' + error);
-    }
-
-}
-
-
-
-
-
-
-// -------------------------------------------
-
-// exebir todos os usuario
-
-async function selectUsuario(db:SQLite.SQLiteDatabase) {
-    try {
-         const result = await db.getAllAsync('SELECT * FROM USUARIO');
-         console.log('Usuarios encontrados');
-         return result;
-    } catch (error) {
-        console.log('Erros ao bucar usuarios');
-    }
-}
-// -------------------------------------------
-
-// Filtrar usuario ID
-
- async function selectUsuarioId(db:SQLite.SQLiteDatabase, id:number) {
-    try {
+        for( const linhas of registro as {ID_US:number, NOME_US:string, EMAIL_US :string } ){
+             
+              console.log(linhas.ID_US, linhas.NOME_US, linhas.EMAIL_US);
+          }
+    console.log("/------------------------------------------------------")
+        const nome  = await selectUsuarioId(db,5);       
+     console.log(nome.ID_US, nome.NOME_US,nome.EMAIL_US,)
         
-       const result = await db.getFirstAsync(' SELECT * FROM USUARIO WHERE ID_US = ?',id);
-       console.log('Filtro de Usuario por ID ' + id );
-       return result;
+    console.log("/------------------------------------------------------");
+       // await deleteUsuario(db, 3);
+      
+       
+     }
+      
+     Main();
+  },[])
 
-    } catch (error) {
-         console.log('Erro ao buscar usuario ' + error);
-    }
 
- }
+  return (
+    <View style={styles.container}>
+     
+      <Button icon="account-alert" mode="contained" onPress={() => console.log('Pressed')}>
+        Inserir
+      </Button>
+      <StatusBar style="auto" />
+    </View>
+  );
+}
 
-
-// -------------------------------------------
-
-export { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
