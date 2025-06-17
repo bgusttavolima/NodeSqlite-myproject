@@ -1,57 +1,119 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button } from 'react-native-paper';
-import { Icon, MD3Colors } from 'react-native-paper';
-import { useEffect, useState } from 'react';
-import { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId, dropTable , deleteUsuario, updateUsuario} from './Conf/Banco';
-export default function App() {
+import * as  SQLite from 'expo-sqlite';
 
-  // ---- HOOK
-  useEffect(()=>{
-     async function Main(){
-        let db =  await Conexao();
-       // await createTable(db);
-       // await dropTable(db, 'USUARIO');
-      // inserirUsuario(db,"Ricardo","@Giovanna");
-
-       const registro = await selectUsuario(db);
-
-        for( const linhas of registro as {ID_US:number, NOME_US:string, EMAIL_US :string } ){
-             
-              console.log(linhas.ID_US, linhas.NOME_US, linhas.EMAIL_US);
-          }
-    console.log("/------------------------------------------------------")
-        const nome  = await selectUsuarioId(db,5);       
-     console.log(nome.ID_US, nome.NOME_US,nome.EMAIL_US,)
-        
-    console.log("/------------------------------------------------------");
-       // await deleteUsuario(db, 3);
-
-       console.log("/------------------------------------------------------");
-       // await updateUsuario(db, 5, "ellen", "@ellen.com");
-       
-     }
-      
-     Main();
-  },[])
-
-
-  return (
-    <View style={styles.container}>
-     
-      <Button icon="account-alert" mode="contained" onPress={() => console.log('Pressed')}>
-        Inserir
-      </Button>
-      <StatusBar style="auto" />
-    </View>
-  );
+async function Conexao() {
+    try {
+        const db = await SQLite.openDatabaseAsync('PAM2');
+        console.log('Banco Criado');
+        return db;
+    } catch (error) {
+        console.log('erro ao criar o banco ' + error);
+    }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// ------------------------------------------------
+
+ async function dropTable(db: SQLite.SQLiteDatabase, tableName: string) {
+    try { 
+        await db.execAsync(`DROP TABLE IF EXISTS ${tableName};`);
+        console.log(`Tabela ${tableName} excluída com sucesso.`);
+    }    catch (error) {
+    
+     console.log(`Erro ao excluir a tabela ${tableName}: ` + error);
+    }
+ }
+
+    //-------------------------------------------
+async function createTable(db: SQLite.SQLiteDatabase) {
+    try {
+        await db.execAsync(
+            `PRAGMA journal_mode = WAL;
+                CREATE TABLE IF NOT EXISTS USUARIO ( 
+                    ID_US INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    NOME_US VARCHAR(100),
+                    EMAIL_US VARCHAR(100)
+                );`
+        );
+        console.log('Tabela Criada !!!');
+
+    } catch (erro) {
+           console.log('Erro Tabela !!!' + erro);           
+    }
+}
+// -------------------------------------------
+// inserir dados na tabela
+
+async function inserirUsuario(db: SQLite.SQLiteDatabase, name:string, email:string) {
+  
+    try {
+          await  db.runAsync(
+            " INSERT INTO USUARIO ( NOME_US, EMAIL_US  ) VALUES(? , ?) ", name, email
+          );
+          console.log("Inserido com sucesso");
+
+    } catch (error) {
+         console.log('Erro ao inserir usuario ' + error);
+    }
+
+}
+
+
+
+
+
+
+// -------------------------------------------
+
+// exebir todos os usuario
+
+async function selectUsuario(db:SQLite.SQLiteDatabase) {
+    try {
+         const result = await db.getAllAsync('SELECT * FROM USUARIO');
+         console.log('Usuarios encontrados');
+         return result;
+    } catch (error) {
+        console.log('Erros ao bucar usuarios');
+    }
+}
+// -------------------------------------------
+
+// Filtrar usuario ID
+
+ async function selectUsuarioId(db:SQLite.SQLiteDatabase, id:number) {
+    try {
+        
+       const result = await db.getFirstAsync(' SELECT * FROM USUARIO WHERE ID_US = ?',id);
+       console.log('Filtro de Usuario por ID ' + id );
+       return result;
+
+    } catch (error) {
+         console.log('Erro ao buscar usuario ' + error);
+    }
+
+ }
+
+  //------------------------------------    
+
+  async function deleteUsuario(db:SQLite.SQLiteDatabase, id:number) {
+    try {
+        await db.runAsync('DELETE FROM USUARIO WHERE ID_US = ?', id);
+        console.log(`Usuário com ID ${id} excluído com sucesso.`);
+    } catch (error) {
+        console.log(`Erro ao excluir usuário com ID ${id}: ` + error);
+    }
+  }
+  //--------------------------------------
+
+  async function updateUsuario(db:SQLite.SQLiteDatabase, id:number, name:string, email:string) {
+    try {
+        await db.runAsync('UPDATE USUARIO SET NOME_US = ?, EMAIL_US = ? WHERE ID_US = ?', name, email, id);
+        console.log(`Usuário com ID ${id} atualizado com sucesso.`);
+    } catch (error) {
+        console.log(`Erro ao atualizar usuário com ID ${id}: ` + error);
+    }
+  }
+
+
+
+// -------------------------------------------
+
+export { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId, dropTable, deleteUsuario, updateUsuario };
