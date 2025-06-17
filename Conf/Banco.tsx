@@ -1,40 +1,57 @@
-import * as  SQLite from 'expo-sqlite';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import { Icon, MD3Colors } from 'react-native-paper';
+import { useEffect, useState } from 'react';
+import { Conexao, createTable, inserirUsuario, selectUsuario, selectUsuarioId, dropTable , deleteUsuario, updateUsuario} from './Conf/Banco';
+export default function App() {
 
-async function Conexao() {
-    try {
-        const db = await SQLite.openDatabaseAsync('PAM2');
-        console.log('Banco Criado');
-        return db;
-    } catch (error) {
-        console.log('erro ao criar o banco ' + error);
-    }
+  // ---- HOOK
+  useEffect(()=>{
+     async function Main(){
+        let db =  await Conexao();
+       // await createTable(db);
+       // await dropTable(db, 'USUARIO');
+      // inserirUsuario(db,"Ricardo","@Giovanna");
+
+       const registro = await selectUsuario(db);
+
+        for( const linhas of registro as {ID_US:number, NOME_US:string, EMAIL_US :string } ){
+             
+              console.log(linhas.ID_US, linhas.NOME_US, linhas.EMAIL_US);
+          }
+    console.log("/------------------------------------------------------")
+        const nome  = await selectUsuarioId(db,5);       
+     console.log(nome.ID_US, nome.NOME_US,nome.EMAIL_US,)
+        
+    console.log("/------------------------------------------------------");
+       // await deleteUsuario(db, 3);
+
+       console.log("/------------------------------------------------------");
+       // await updateUsuario(db, 5, "ellen", "@ellen.com");
+       
+     }
+      
+     Main();
+  },[])
+
+
+  return (
+    <View style={styles.container}>
+     
+      <Button icon="account-alert" mode="contained" onPress={() => console.log('Pressed')}>
+        Inserir
+      </Button>
+      <StatusBar style="auto" />
+    </View>
+  );
 }
 
-//-------------------------------------------
-async function createTable(db: SQLite.SQLiteDatabase) {
-    try {
-        await db.execAsync(
-            ` PRAGMA journal_mode = WAL;
-        CREATE TABLE IF NOT EXISTS USUARIO(
-           ID_US INTERGER PRIMARY KEY AUTOINCREMENT,
-           NOME_US VARCHAR(100),
-           EMAIL_US VARCHAR(100)
-        )`
-        );
-        console.log('Tabela Criada !!!');
-
-    } catch (erro) {
-           console.log('Erro Tabela !!!');           
-    }
-}
-
-
-async function inserirUsuario(db: SQLite.SQLiteDatabase) {
-
-}
-
-
-
-// -------------------------------------------
-
-export { Conexao, createTable };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
