@@ -2,7 +2,7 @@ import * as  SQLite from 'expo-sqlite';
 
 async function Conexao() {
     try {
-        const db = await SQLite.openDatabaseAsync('PAM2');
+        const db:SQLite.SQLiteDatabase = await SQLite.openDatabaseAsync('PAM2');
         console.log('Banco Criado');
         return db;
     } catch (error) {
