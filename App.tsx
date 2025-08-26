@@ -14,15 +14,14 @@ export default function App() {
        // await dropTable(db, 'USUARIO');
       // inserirUsuario(db,"Ricardo","@Giovanna");
 
-       const registro = await selectUsuario(db);
+       const usuarios = await selectUsuario(db!);
 
-        for( const linhas of registro as {ID_US:number, NOME_US:string, EMAIL_US :string } ){
-             
-              console.log(linhas.ID_US, linhas.NOME_US, linhas.EMAIL_US);
+        for( const usuario of usuarios){
+              console.log(usuario.ID_US, usuario.NOME_US, usuario.EMAIL_US);
           }
           
-        const nome  = await selectUsuarioId(db,5);       
-     console.log(nome.ID_US, nome.NOME_US,nome.EMAIL_US,)
+        const usuario  = await selectUsuarioId(db!,5);       
+     console.log(usuario.ID_US, usuario.NOME_US,usuario.EMAIL_US,)
         
     console.log("/------------------------------------------------------");
        // await deleteUsuario(db, 3);

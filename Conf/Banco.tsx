@@ -1,5 +1,14 @@
 import * as  SQLite from 'expo-sqlite';
 
+ type usuarios = {
+    ID_US:number, 
+    NOME_US:string, 
+    EMAIL_US :string
+}
+
+
+
+
 async function Conexao() {
     try {
         const db:SQLite.SQLiteDatabase = await SQLite.openDatabaseAsync('PAM2');
@@ -65,28 +74,34 @@ async function inserirUsuario(db: SQLite.SQLiteDatabase, name:string, email:stri
 
 // exebir todos os usuario
 
-async function selectUsuario(db:SQLite.SQLiteDatabase) {
+async function selectUsuario(db:SQLite.SQLiteDatabase): Promise<usuarios[]> {
     try {
-         const result = await db.getAllAsync('SELECT * FROM USUARIO');
-         console.log('Usuarios encontrados');
+         const result = await db.getAllAsync<usuarios>('SELECT * FROM USUARIO');
+         console.log('Usuarios encontrados', result);
          return result;
     } catch (error) {
-        console.log('Erros ao bucar usuarios');
+        console.log('Erros ao bucar usuarios'); 
+        return [];
     }
 }
 // -------------------------------------------
 
 // Filtrar usuario ID
 
- async function selectUsuarioId(db:SQLite.SQLiteDatabase, id:number) {
+ async function selectUsuarioId(db:SQLite.SQLiteDatabase, id:number): Promise<usuarios> {
     try {
         
-       const result = await db.getFirstAsync(' SELECT * FROM USUARIO WHERE ID_US = ?',id);
-       console.log('Filtro de Usuario por ID ' + id );
-       return result;
+       const result = await db.getFirstAsync<usuarios>(' SELECT * FROM USUARIO WHERE ID_US = ?',id);
+       if(result == null){
+           console.log("burro")
+       }else{
+        console.log('Filtro de Usuario por ID ' + id );
+        return result;
+       }
 
     } catch (error) {
          console.log('Erro ao buscar usuario ' + error);
+        return 
     }
 
  }
