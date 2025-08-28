@@ -19,10 +19,15 @@ export default function App() {
         for( const usuario of usuarios){
               console.log(usuario.ID_US, usuario.NOME_US, usuario.EMAIL_US);
           }
-          
-        const usuario  = await selectUsuarioId(db!,5);       
-     console.log(usuario.ID_US, usuario.NOME_US,usuario.EMAIL_US,)
-        
+
+          //select by id
+        const usuario  = await selectUsuarioId(db!,5);     
+        if(usuario){
+         console.log(usuario.ID_US, usuario.NOME_US,usuario.EMAIL_US)
+        }else{
+         console.log("não foi possivel encontrar")
+        }
+   
     console.log("/------------------------------------------------------");
        // await deleteUsuario(db, 3);
 

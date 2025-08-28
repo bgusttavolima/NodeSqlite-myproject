@@ -88,23 +88,24 @@ async function selectUsuario(db:SQLite.SQLiteDatabase): Promise<usuarios[]> {
 
 // Filtrar usuario ID
 
- async function selectUsuarioId(db:SQLite.SQLiteDatabase, id:number): Promise<usuarios> {
+async function selectUsuarioId(db: SQLite.SQLiteDatabase, id: number): Promise<usuarios | undefined> {
     try {
-        
-       const result = await db.getFirstAsync<usuarios>(' SELECT * FROM USUARIO WHERE ID_US = ?',id);
-       if(result == null){
-           console.log("burro")
-       }else{
-        console.log('Filtro de Usuario por ID ' + id );
-        return result;
-       }
+        const result = await db.getFirstAsync<usuarios>('SELECT * FROM USUARIO WHERE ID_US = ?', id);
+
+        if (result == null) {
+            console.log("Usuário não encontrado.");
+            return undefined;
+        } else {
+            console.log('Filtro de Usuario por ID ' + id);
+            return result;
+        }
 
     } catch (error) {
-         console.log('Erro ao buscar usuario ' + error);
-        return 
+        console.log('Erro ao buscar usuário: ' + error);
+        return undefined;
     }
+}
 
- }
 
   //------------------------------------    
 
