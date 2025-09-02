@@ -9,6 +9,7 @@ import * as  SQLite from 'expo-sqlite';
 
 
 
+
 async function Conexao() {
     try {
         const db:SQLite.SQLiteDatabase = await SQLite.openDatabaseAsync('PAM2');
@@ -32,7 +33,7 @@ async function Conexao() {
  }
 
     //-------------------------------------------
-async function createTable(db: SQLite.SQLiteDatabase) {
+async function createTable(db: SQLite.SQLiteDatabase):Promise<boolean> {
     try {
         await db.execAsync(
             `PRAGMA journal_mode = WAL;
@@ -43,10 +44,11 @@ async function createTable(db: SQLite.SQLiteDatabase) {
                 );`
         );
         console.log('Tabela Criada !!!');
+        return true;
 
     } catch (erro) {
            console.log('Erro Tabela !!!' + erro);           
-    }
+    }      return false; 
 }
 // -------------------------------------------
 // inserir dados na tabela
@@ -111,7 +113,8 @@ async function selectUsuarioId(db: SQLite.SQLiteDatabase, id: number): Promise<u
 
   async function deleteUsuario(db:SQLite.SQLiteDatabase, id:number) {
     try {
-        await db.runAsync('DELETE FROM USUARIO WHERE ID_US = ?', id);
+
+        const deletarUsuario = await db.runAsync('DELETE FROM USUARIO WHERE ID_US = ?', id);
         console.log(`Usuário com ID ${id} excluído com sucesso.`);
     } catch (error) {
         console.log(`Erro ao excluir usuário com ID ${id}: ` + error);

@@ -10,7 +10,17 @@ export default function App() {
    useEffect(()=>{
      async function Main(){
         let db =  await Conexao();
-       // await createTable(db);
+
+        if(!db)
+        {
+          console.log("erro:conexao nao foi estabelecida.")
+          return;
+        }
+
+        await createTable(db);
+        
+       
+
        // await dropTable(db, 'USUARIO');
       // inserirUsuario(db,"Ricardo","@Giovanna");
 
@@ -28,7 +38,11 @@ export default function App() {
          console.log("não foi possivel encontrar")
         }
    
+   
     console.log("/------------------------------------------------------");
+        
+      const Usuario =  await deleteUsuario(db!,3)
+      
        // await deleteUsuario(db, 3);
 
        console.log("/------------------------------------------------------");
@@ -41,5 +55,5 @@ export default function App() {
   },[])
 
   return (
-    Home()
+    <Home />
 )};
